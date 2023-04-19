@@ -1,0 +1,4 @@
+This is a sample text file. :/
+It contains 4 lines of data. :P
+This is the third line of data!
+This is the fourth 第四 line containing 中文 of the data.
