@@ -23,8 +23,11 @@ def main(EccPublicKey, keySize, partNum):
     print("="*70)
     print("  Please enter the name of file to encrypt present in ./test_files/")
     print("="*70)
-    input_file = input(
-        "Enncrypt : ")
+    # input_file = input(
+    #     "Enncrypt : ")
+        
+
+    input_file = "test.jpg"
     file_type = input_file.split(".")[1]
     output_file = "test."+file_type
 
@@ -38,27 +41,41 @@ def main(EccPublicKey, keySize, partNum):
 
 
     # 2. break message into many parts and get related keys
-    messageBox = []
+    plainMessageBox = []
+    cipherMessageBox = []
     keyBox = []
     keyBox.append(EccPublicKey)
 
     singleLen = int(len(multimedia_data)/partNum)+1
     for i in range(0, partNum):
         mi = multimedia_data[i*singleLen: (i+1)*singleLen]
-        messageBox.append(mi)
-        keyBox.append(findAesKey(mi, keySize))
+        plainMessageBox.append(mi)
+        print("mi: ", mi)
+        # keyBox.append(findAesKey(mi, keySize))
 
     # 3. encrypt the first message part m1 with ECC public key
     # ecc = ECC.ECC()
-    (C1_multimedia, C2_multimedia) = ecc.encryption(EccPublicKey, messageBox[0])
+    (C1_multimedia, C2_multimedia) = ecc.encryption(EccPublicKey, plainMessageBox[0])
+    print("C1_multimedia: ", C1_multimedia)
+    print("C2_multimedia: ", C2_multimedia)
+    print("different",max(C1_multimedia)-min(C1_multimedia))
+
+    cipherMessageBox.append(
+        str(max(C1_multimedia)-min(C1_multimedia)+C2_multimedia))
+    print("cipherMessageBox: ", cipherMessageBox)
+    keyBox.append(findAesKey(cipherMessageBox[0], keySize))
+
 
 
     # 4. use keys in keyBox to encrypt other messages
     aesMessageBox = []
     for i in range(1, partNum):
         aes = AES.AES(keyBox[i])
-        encrypted_multimedia = aes.encryptBigData(messageBox[i])
+        encrypted_multimedia = aes.encryptBigData(plainMessageBox[i])
         aesMessageBox.append(encrypted_multimedia)
+        cipherMessageBox.append(str(sum(encrypted_multimedia)))
+        print("encrypted_multimedia: ", encrypted_multimedia, "i", i)
+        keyBox.append(findAesKey(cipherMessageBox[i], keySize))
 
     # 5. write into cipher, save the json file
     cipher = {

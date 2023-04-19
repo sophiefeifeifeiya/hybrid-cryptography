@@ -41,19 +41,23 @@ def main(privateKeyECC):
 
     # 3. find AES key from m1 and decrypt m2, then find key in m2 to decrypt m3 .....
     messageBox = []
-    keyAES = findAesKey(messageECC, KeySize)
+    keyAES = findAesKey(str(max(C1_multimedia)-min(C1_multimedia)+C2_multimedia), KeySize)
 
     for i in range(0, PartNum-1):
         aes_obj = AES.AES(keyAES)
         decrypted_multimedia = aes_obj.decryptBigData(cipherBox[i])
-        keyAES = findAesKey(decrypted_multimedia, KeySize)
+        keyAES = findAesKey(str(sum(cipherBox[i])), KeySize)
         messageBox.append(decrypted_multimedia)
 
     # 4. put messageECC and messageBox together
-    totalMessage = ""
-    totalMessage = totalMessage + messageECC
+    # totalMessage = converter.fileToBase64("success.txt")
+    totalMessage = messageECC
     for i in messageBox:
         totalMessage = totalMessage + i
+
+    # totalMessage = totalMessage + converter.fileToBase64("success.txt")
+
+    print(totalMessage)
 
     output_file = "Decrypted_file." + file_type
     converter.base64ToFile(totalMessage, output_file)
